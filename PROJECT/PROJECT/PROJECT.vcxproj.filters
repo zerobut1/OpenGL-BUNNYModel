@@ -18,7 +18,7 @@
     <ClCompile Include="..\..\..\DOWNLOAD\glad\src\glad.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="colors.cpp">
+    <ClCompile Include="learning.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

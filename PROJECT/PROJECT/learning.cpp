@@ -133,8 +133,9 @@ int main()
     // 复制数据略
     // 设置顶点属性指针
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3*sizeof(float)));
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3*sizeof(float)));
+    glEnableVertexAttribArray(1);
     //----------
 
     //-----lightCubeVAO-----
@@ -172,11 +173,11 @@ int main()
         lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         lightingShader.setMat4("projection", projection);
         lightingShader.setMat4("view", view);
-
+        lightingShader.setVec3("lightPos",lightPos);
+        lightingShader.setVec3("viewPos",camera.Position);
         // 模型矩阵
         glm::mat4 model = glm::mat4(1.0f);
         lightingShader.setMat4("model", model);
-
         // 绘制
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -186,13 +187,11 @@ int main()
         lightCubeShader.use();
         lightCubeShader.setMat4("projection", projection);
         lightCubeShader.setMat4("view", view);
-
         // 模型矩阵
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(0.2f));
         lightCubeShader.setMat4("model", model);
-
         // 绘制
         glBindVertexArray(lightCubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);

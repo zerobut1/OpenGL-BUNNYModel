@@ -133,7 +133,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DOWNLOAD\glad\src\glad.c" />
-    <ClCompile Include="colors.cpp" />
+    <ClCompile Include="learning.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
