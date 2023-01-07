@@ -1,4 +1,4 @@
-/*
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -9,9 +9,9 @@
 #include <cstdio>
 #include <iostream>
 
-#include "Shader.h"
-#include "Camera.h"
-#include "stb_image.h"
+#include "head/shader.h"
+#include "head/camera.h"
+#include "head/stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -71,8 +71,8 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     // 创建shader对象
-    Shader lightingShader("colors.vs", "colors.fs");
-    Shader lightCubeShader("light_cube.vs", "light_cube.fs");
+    Shader lightingShader("shader/lighting/lighting.vs", "shader/lighting/lighting.fs");
+    Shader lightCubeShader("shader/light_cube/light_cube.vs", "shader/light_cube/light_cube.fs");
 
     // 包含法向量和纹理坐标的正方体顶点数据
     float vertices[] = {
@@ -391,4 +391,3 @@ unsigned int loadTexture(char const *path)
 
     return textureID;
 }
-*/

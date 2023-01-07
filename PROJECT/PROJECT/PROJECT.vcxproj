@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>D:\OPENGL\GLFW\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\OPENGL\GLFW\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\OPENGL\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\OPENGL\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -133,27 +133,26 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DOWNLOAD\glad\src\glad.c" />
-    <ClCompile Include="Lighting.cpp" />
     <ClCompile Include="LoadModel.cpp" />
     <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="camera.h" />
-    <ClInclude Include="mesh.h" />
-    <ClInclude Include="model.h" />
-    <ClInclude Include="shader.h" />
-    <ClInclude Include="stb_image.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="colors.fs" />
-    <None Include="colors.vs" />
-    <None Include="light_cube.fs" />
-    <None Include="light_cube.vs" />
-    <None Include="model_loading.fs" />
-    <None Include="model_loading.vs" />
+    <None Include="shader\lighting\lighting.fs" />
+    <None Include="shader\lighting\lighting.vs" />
+    <None Include="shader\light_cube\light_cube.fs" />
+    <None Include="shader\light_cube\light_cube.vs" />
+    <None Include="shader\model_loading\model_loading.fs" />
+    <None Include="shader\model_loading\model_loading.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="container2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="head\camera.h" />
+    <ClInclude Include="head\mesh.h" />
+    <ClInclude Include="head\model.h" />
+    <ClInclude Include="head\shader.h" />
+    <ClInclude Include="head\stb_image.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
