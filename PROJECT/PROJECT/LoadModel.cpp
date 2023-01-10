@@ -7,6 +7,7 @@
 
 #include "head/shader.h"
 #include "head/camera.h"
+// #define STB_IMAGE_IMPLEMENTATION
 #include "head/stb_image.h"
 #include "head/model.h"
 
@@ -16,6 +17,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
 
 // 显示设置
 const unsigned int SCR_WIDTH = 1920;
@@ -33,6 +35,11 @@ float lastFrame = 0.0f;
 
 // 光源位置
 glm::vec3 lightPos(-10.0f, 3.0f, 10.0f);
+
+// 拾取的点的位置
+glm::vec3 pickPos(2.696138f, 2.284638f, 9.227790f);
+
+Model *m_Model = NULL;
 
 int main()
 {
@@ -55,9 +62,10 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     // 捕捉光标
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // 初始化glad
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -75,9 +83,12 @@ int main()
     // 创建shader对象
     Shader ourShader("shader/model_loading/model_loading.vs", "shader/model_loading/model_loading.fs");
     Shader lightCubeShader("shader/light_cube/light_cube.vs", "shader/light_cube/light_cube.fs");
+    Shader pickShader("shader/light_cube/light_cube.vs", "shader/light_cube/light_cube.fs");
 
     // 加载模型
     Model ourModel("bunny_iH.ply");
+
+    m_Model = &ourModel;
 
     float vertices[] = {
         // positions          // normals           // texture coords
@@ -131,6 +142,18 @@ int main()
     // 复制数据
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(0);
+
+    unsigned int pickPointVAO;
+    glGenVertexArrays(1, &pickPointVAO);
+    glBindVertexArray(pickPointVAO);
+    // unsigned int VBO;
+    // glGenBuffers(1, &VBO);
+    //  复制数据
+    // glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
@@ -196,6 +219,7 @@ int main()
 
         ourModel.Draw(ourShader);
 
+        //-----点光源-----
         lightCubeShader.use();
         lightCubeShader.setMat4("projection", projection);
         lightCubeShader.setMat4("view", view);
@@ -207,6 +231,20 @@ int main()
         model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
         lightCubeShader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+        //----------
+
+        //-----拾取点-----
+        pickShader.use();
+        pickShader.setMat4("projection", projection);
+        pickShader.setMat4("view", view);
+        // 绘制
+        glBindVertexArray(pickPointVAO);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, pickPos);
+        model = glm::scale(model, glm::vec3(0.05f)); // Make it a smaller cube
+        lightCubeShader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        //----------
 
         // 检查事件，交换缓冲
         glfwSwapBuffers(window);
@@ -255,10 +293,51 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
     lastX = xpos;
     lastY = ypos;
 
+    // MouseX = xpos;
+    // MouseY = ypos;
+
     camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
+{
+    switch (button)
+    {
+    case GLFW_MOUSE_BUTTON_LEFT:
+        if (action == GLFW_PRESS)
+        {
+            double MouseX, MouseY;
+            glfwGetCursorPos(window, &MouseX, &MouseY);
+
+            glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+            glm::mat4 view = camera.GetViewMatrix();
+            glm::mat4 model = glm::mat4(1.0f);
+            
+            double mindis = 100.0;
+            bool flag = 0;
+            int idx = -1;
+
+            for (int i = 0; i < m_Model->meshes[0].vertices.size(); i++)
+            {
+                glm::vec4 pointPosition = projection * view * model * glm::vec4(m_Model->meshes[0].vertices[i].Position, 1.0);
+
+                double screenX = (pointPosition.x + pointPosition.w) / (2 * pointPosition.w) * SCR_WIDTH;
+                double screenY = (pointPosition.w - pointPosition.y) / (2 * pointPosition.w) * SCR_HEIGHT;
+                double dis = glm::distance(glm::vec2(MouseX, MouseY), glm::vec2(screenX, screenY));
+
+                if(dis < mindis && m_Model->meshes[0].vertices[i].Normal.z<0){
+                    mindis = dis;
+                    flag = 1;
+                    idx = i;
+                }
+            }
+            if(flag)
+            pickPos =  m_Model->meshes[0].vertices[idx].Position;
+        }
+    }
 }
