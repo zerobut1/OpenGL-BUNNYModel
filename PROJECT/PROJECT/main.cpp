@@ -64,7 +64,7 @@ int main()
     glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     // 捕捉光标
-    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //
 
     // 初始化glad
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -215,9 +215,9 @@ int main()
         ourShader.setFloat("spotLight.quadratic", 0.032f);
         ourShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
         ourShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
-
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         ourModel.Draw(ourShader);
-
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         //-----点光源-----
         lightCubeShader.use();
         lightCubeShader.setMat4("projection", projection);
@@ -267,6 +267,10 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        camera.ProcessKeyboard(UP, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        camera.ProcessKeyboard(DOWN, deltaTime);
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
@@ -276,26 +280,33 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
 {
-    float xpos = static_cast<float>(xposIn);
-    float ypos = static_cast<float>(yposIn);
-
-    if (firstMouse)
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
     {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
+        float xpos = static_cast<float>(xposIn);
+        float ypos = static_cast<float>(yposIn);
+
+        if (firstMouse)
+        {
+            lastX = xpos;
+            lastY = ypos;
+            firstMouse = false;
+        }
+
+        float xoffset = xpos - lastX;
+        float yoffset = lastY - ypos;
+
         lastX = xpos;
         lastY = ypos;
-        firstMouse = false;
+
+        camera.ProcessMouseMovement(xoffset, yoffset);
     }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
-
-    lastX = xpos;
-    lastY = ypos;
-
-    // MouseX = xpos;
-    // MouseY = ypos;
-
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    else
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        firstMouse = true;
+    }
 }
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
@@ -305,22 +316,29 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 {
+    double MouseX, MouseY;
+    glfwGetCursorPos(window, &MouseX, &MouseY);
     switch (button)
     {
     case GLFW_MOUSE_BUTTON_LEFT:
         if (action == GLFW_PRESS)
         {
-            double MouseX, MouseY;
-            glfwGetCursorPos(window, &MouseX, &MouseY);
-
             glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
             glm::mat4 view = camera.GetViewMatrix();
             glm::mat4 model = glm::mat4(1.0f);
-            
-            double mindis = 100.0;
+
+            double mindis = 50.0;
+            double maxZ = 10.0;
             bool flag = 0;
             int idx = -1;
 
+            glm::vec4 pointPosition = projection * view * model * glm::vec4(m_Model->meshes[0].vertices[0].Position, 1.0);
+
+            double screenX = (pointPosition.x + pointPosition.w) / (2 * pointPosition.w) * SCR_WIDTH;
+            double screenY = (pointPosition.w - pointPosition.y) / (2 * pointPosition.w) * SCR_HEIGHT;
+            double dis = glm::distance(glm::vec2(MouseX, MouseY), glm::vec2(screenX, screenY));
+
+            cout << screenX << " " << screenY << " " << pointPosition.z << endl;
             for (int i = 0; i < m_Model->meshes[0].vertices.size(); i++)
             {
                 glm::vec4 pointPosition = projection * view * model * glm::vec4(m_Model->meshes[0].vertices[i].Position, 1.0);
@@ -329,14 +347,17 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
                 double screenY = (pointPosition.w - pointPosition.y) / (2 * pointPosition.w) * SCR_HEIGHT;
                 double dis = glm::distance(glm::vec2(MouseX, MouseY), glm::vec2(screenX, screenY));
 
-                if(dis < mindis && m_Model->meshes[0].vertices[i].Normal.z<0){
-                    mindis = dis;
+                if (dis < mindis && pointPosition.z < maxZ)
+                {
+                    // mindis = dis;
+                    maxZ = pointPosition.z;
                     flag = 1;
                     idx = i;
                 }
             }
-            if(flag)
-            pickPos =  m_Model->meshes[0].vertices[idx].Position;
+            if (flag)
+                pickPos = m_Model->meshes[0].vertices[idx].Position;
         }
+        break;
     }
 }

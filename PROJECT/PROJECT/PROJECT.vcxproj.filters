@@ -70,5 +70,8 @@
     <None Include="model\bunny_iH.ply">
       <Filter>资源文件\模型数据</Filter>
     </None>
+    <None Include="todolist.md">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

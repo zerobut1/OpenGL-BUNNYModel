@@ -144,6 +144,7 @@
     <None Include="shader\light_cube\light_cube.vs" />
     <None Include="shader\model_loading\model_loading.fs" />
     <None Include="shader\model_loading\model_loading.vs" />
+    <None Include="todolist.md" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="head\camera.h" />
