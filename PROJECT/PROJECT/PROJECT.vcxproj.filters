@@ -13,15 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="资源文件\着色器">
+      <UniqueIdentifier>{837ec0b2-dc56-40b1-a63b-2e3c862eb83a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\模型数据">
+      <UniqueIdentifier>{bdc4b5d9-2076-4248-bfa3-92a49ac91aae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\DOWNLOAD\glad\src\glad.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="LoadModel.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="stb_image.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="glad.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -43,16 +49,26 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader\lighting\lighting.fs" />
-    <None Include="shader\lighting\lighting.vs" />
-    <None Include="shader\light_cube\light_cube.fs" />
-    <None Include="shader\light_cube\light_cube.vs" />
-    <None Include="shader\model_loading\model_loading.fs" />
-    <None Include="shader\model_loading\model_loading.vs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="container2.png">
-      <Filter>资源文件</Filter>
-    </Image>
+    <None Include="shader\light_cube\light_cube.fs">
+      <Filter>资源文件\着色器</Filter>
+    </None>
+    <None Include="shader\light_cube\light_cube.vs">
+      <Filter>资源文件\着色器</Filter>
+    </None>
+    <None Include="shader\lighting\lighting.fs">
+      <Filter>资源文件\着色器</Filter>
+    </None>
+    <None Include="shader\lighting\lighting.vs">
+      <Filter>资源文件\着色器</Filter>
+    </None>
+    <None Include="shader\model_loading\model_loading.fs">
+      <Filter>资源文件\着色器</Filter>
+    </None>
+    <None Include="shader\model_loading\model_loading.vs">
+      <Filter>资源文件\着色器</Filter>
+    </None>
+    <None Include="model\bunny_iH.ply">
+      <Filter>资源文件\模型数据</Filter>
+    </None>
   </ItemGroup>
 </Project>

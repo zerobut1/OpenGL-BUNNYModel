@@ -7,7 +7,6 @@
 
 #include "head/shader.h"
 #include "head/camera.h"
-// #define STB_IMAGE_IMPLEMENTATION
 #include "head/stb_image.h"
 #include "head/model.h"
 
@@ -86,7 +85,7 @@ int main()
     Shader pickShader("shader/light_cube/light_cube.vs", "shader/light_cube/light_cube.fs");
 
     // 加载模型
-    Model ourModel("bunny_iH.ply");
+    Model ourModel("model/bunny_iH.ply");
 
     m_Model = &ourModel;
 

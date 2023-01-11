@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>D:\OPENGL\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\OPENGL\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\PROJECT\OpenGL_bunny\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\PROJECT\OpenGL_bunny\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -132,20 +132,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\DOWNLOAD\glad\src\glad.c" />
-    <ClCompile Include="LoadModel.cpp" />
+    <ClCompile Include="glad.c" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="model\bunny_iH.ply" />
     <None Include="shader\lighting\lighting.fs" />
     <None Include="shader\lighting\lighting.vs" />
     <None Include="shader\light_cube\light_cube.fs" />
     <None Include="shader\light_cube\light_cube.vs" />
     <None Include="shader\model_loading\model_loading.fs" />
     <None Include="shader\model_loading\model_loading.vs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="container2.png" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="head\camera.h" />
