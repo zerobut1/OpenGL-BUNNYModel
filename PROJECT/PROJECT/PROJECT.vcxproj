@@ -137,14 +137,14 @@
     <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assimp-vc143-mtd.dll" />
     <None Include="model\bunny_iH.ply" />
-    <None Include="shader\lighting\lighting.fs" />
-    <None Include="shader\lighting\lighting.vs" />
     <None Include="shader\light_cube\light_cube.fs" />
     <None Include="shader\light_cube\light_cube.vs" />
     <None Include="shader\model_loading\model_loading.fs" />
     <None Include="shader\model_loading\model_loading.vs" />
-    <None Include="todolist.md" />
+    <None Include="shader\pick_point\pickpioint.fs" />
+    <None Include="shader\pick_point\pickpoint.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="head\camera.h" />

@@ -1,6 +1,5 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -12,43 +11,92 @@
 
 #include <iostream>
 
+// ·½¿é¶¥µãÊı¾İ
+float cube_vertices[] = {
+    -0.5f, -0.5f, -0.5f,
+    0.5f, -0.5f, -0.5f,
+    0.5f, 0.5f, -0.5f,
+    0.5f, 0.5f, -0.5f,
+    -0.5f, 0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+
+    -0.5f, -0.5f, 0.5f,
+    0.5f, -0.5f, 0.5f,
+    0.5f, 0.5f, 0.5f,
+    0.5f, 0.5f, 0.5f,
+    -0.5f, 0.5f, 0.5f,
+    -0.5f, -0.5f, 0.5f,
+
+    -0.5f, 0.5f, 0.5f,
+    -0.5f, 0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, 0.5f,
+    -0.5f, 0.5f, 0.5f,
+
+    0.5f, 0.5f, 0.5f,
+    0.5f, 0.5f, -0.5f,
+    0.5f, -0.5f, -0.5f,
+    0.5f, -0.5f, -0.5f,
+    0.5f, -0.5f, 0.5f,
+    0.5f, 0.5f, 0.5f,
+
+    -0.5f, -0.5f, -0.5f,
+    0.5f, -0.5f, -0.5f,
+    0.5f, -0.5f, 0.5f,
+    0.5f, -0.5f, 0.5f,
+    -0.5f, -0.5f, 0.5f,
+    -0.5f, -0.5f, -0.5f,
+
+    -0.5f, 0.5f, -0.5f,
+    0.5f, 0.5f, -0.5f,
+    0.5f, 0.5f, 0.5f,
+    0.5f, 0.5f, 0.5f,
+    -0.5f, 0.5f, 0.5f,
+    -0.5f, 0.5f, -0.5f};
+
+void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
-void processInput(GLFWwindow *window);
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
+void callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
-// æ˜¾ç¤ºè®¾ç½®
+// ´°¿Ú´óĞ¡ÉèÖÃ
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 
-// æ‘„åƒæœºå¯¹è±¡
+// ÉãÏñ»ú¶ÔÏó
 Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
-// æ—¶é—´å·®
+// Ê±¼ä²î
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-// å…‰æºä½ç½®
+// ¹âÔ´Î»ÖÃ
 glm::vec3 lightPos(-10.0f, 3.0f, 10.0f);
 
-// æ‹¾å–çš„ç‚¹çš„ä½ç½®
+// Ê°È¡µÄµãµÄÎ»ÖÃ
 glm::vec3 pickPos(2.696138f, 2.284638f, 9.227790f);
 
+// Ä£ĞÍÖ¸Õë
 Model *m_Model = NULL;
+
+// Ïß¿òÄ£Ê½
+bool line_mode = false;
 
 int main()
 {
-    // åˆå§‹åŒ–
+    // ³õÊ¼»¯
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    // åˆ›å»ºçª—å£
+    // ´´½¨´°¿Ú
     GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
     if (window == NULL)
     {
@@ -56,155 +104,106 @@ int main()
         glfwTerminate();
         return -1;
     }
-    // ç»‘å®šå‡½æ•°
+    // °ó¶¨º¯Êı
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetKeyCallback(window, callback);
 
-    // æ•æ‰å…‰æ ‡
-    //
-
-    // åˆå§‹åŒ–glad
+    // ³õÊ¼»¯glad
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
 
-    // ç¿»è½¬yè½´
+    // ·­×ªyÖá
     stbi_set_flip_vertically_on_load(true);
 
-    // æ‰“å¼€zç¼“å­˜
+    // ´ò¿ªz»º´æ
     glEnable(GL_DEPTH_TEST);
 
-    // åˆ›å»ºshaderå¯¹è±¡
+    // ´´½¨shader¶ÔÏó
     Shader ourShader("shader/model_loading/model_loading.vs", "shader/model_loading/model_loading.fs");
     Shader lightCubeShader("shader/light_cube/light_cube.vs", "shader/light_cube/light_cube.fs");
-    Shader pickShader("shader/light_cube/light_cube.vs", "shader/light_cube/light_cube.fs");
+    Shader pickShader("shader/pick_point/pickpoint.vs", "shader/pick_point/pickpoint.fs");
 
-    // åŠ è½½æ¨¡å‹
+    // ¼ÓÔØÄ£ĞÍ
     Model ourModel("model/bunny_iH.ply");
-
     m_Model = &ourModel;
 
-    float vertices[] = {
-        // positions          // normals           // texture coords
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-
-        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-
-        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f};
-
+    //-----µã¹âÔ´µÄVAO-----
     unsigned int lightCubeVAO;
     glGenVertexArrays(1, &lightCubeVAO);
     glBindVertexArray(lightCubeVAO);
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    // å¤åˆ¶æ•°æ®
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+    unsigned int lightCubeVBO;
+    glGenBuffers(1, &lightCubeVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, lightCubeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, lightCubeVBO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
+    //----------
 
+    //-----Ê°È¡µãµÄVAO-----
     unsigned int pickPointVAO;
     glGenVertexArrays(1, &pickPointVAO);
     glBindVertexArray(pickPointVAO);
-    // unsigned int VBO;
-    // glGenBuffers(1, &VBO);
-    //  å¤åˆ¶æ•°æ®
-    // glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+    unsigned int pickPointVBO;
+    glGenBuffers(1, &pickPointVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, pickPointVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, pickPointVBO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
+    //----------
 
-    // æ¸²æŸ“å¾ªç¯
+    // äÖÈ¾Ñ­»·
     while (!glfwWindowShouldClose(window))
     {
-        // æ—¶é—´å·®
+        // Ê±¼ä²î
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // æ£€æµ‹è¾“å…¥
+        // ¼ì²âÊäÈë
         processInput(window);
 
-        // æ¸…é™¤é¢œè‰²ç¼“å†²
-        glClearColor(0.4f, 0.8f, 1.0f, 1.0f);
+        // Çå³ıÑÕÉ«»º³å
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // æ­£å¼æ¸²æŸ“å‰ä½¿ç”¨shader
-        ourShader.use();
-
-        // æŠ•å½±çŸ©é˜µä¸è§‚å¯ŸçŸ©é˜µ
+        // Í¶Ó°¾ØÕóÓë¹Û²ì¾ØÕó
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
+
+        //-----äÖÈ¾Ä£ĞÍ-----
+        ourShader.use();
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
-
-        // æ¸²æŸ“åŠ è½½çš„æ¨¡å‹
         glm::mat4 model = glm::mat4(1.0f);
-        // model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        // model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));     // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);
-
-        ourShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-        ourShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
-        ourShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-        ourShader.setFloat("material.shininess", 32.0f);
-
+        // ²ÉÓÃÁÁÍ­µÄ²ÄÖÊ
+        ourShader.setVec3("material.ambient", 0.229500f, 0.088250f, 0.027500f);
+        ourShader.setVec3("material.diffuse", 0.550800f, 0.211800f, 0.066000f);
+        ourShader.setVec3("material.specular", 0.580594f, 0.223257f, 0.069570f);
+        ourShader.setFloat("material.shininess", 51.200001f);
+        // ÉèÖÃ¶¨Ïò¹â
         ourShader.setVec3("dirLight.direction", 0.2f, -1.0f, 0.3f);
         ourShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
         ourShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
         ourShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
-
-        ourShader.setVec3("pointLights[0].position", lightPos);
-        ourShader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
-        ourShader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
-        ourShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-        ourShader.setFloat("pointLights[0].constant", 1.0f);
-        ourShader.setFloat("pointLights[0].linear", 0.09f);
-        ourShader.setFloat("pointLights[0].quadratic", 0.032f);
-
+        // ÉèÖÃµã¹âÔ´
+        ourShader.setVec3("pointLights.position", lightPos);
+        ourShader.setVec3("pointLights.ambient", 0.05f, 0.05f, 0.05f);
+        ourShader.setVec3("pointLights.diffuse", 0.8f, 0.8f, 0.8f);
+        ourShader.setVec3("pointLights.specular", 1.0f, 1.0f, 1.0f);
+        ourShader.setFloat("pointLights.constant", 1.0f);
+        ourShader.setFloat("pointLights.linear", 0.09f);
+        ourShader.setFloat("pointLights.quadratic", 0.032f);
+        // ÉèÖÃ¾Û¹â
         ourShader.setVec3("spotLight.position", camera.Position);
         ourShader.setVec3("spotLight.direction", camera.Front);
         ourShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
@@ -215,37 +214,47 @@ int main()
         ourShader.setFloat("spotLight.quadratic", 0.032f);
         ourShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
         ourShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        // »æÖÆ
+        // ÊÇ·ñÎªÏß¿òÄ£Ê½
+        if (line_mode)
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        else
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
         ourModel.Draw(ourShader);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        //-----ç‚¹å…‰æº-----
+        //----------
+
+        //-----µã¹âÔ´-----
         lightCubeShader.use();
         lightCubeShader.setMat4("projection", projection);
         lightCubeShader.setMat4("view", view);
-        // ç»˜åˆ¶
-        glBindVertexArray(lightCubeVAO);
-
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
+        model = glm::scale(model, glm::vec3(0.2f));
         lightCubeShader.setMat4("model", model);
+        // »æÖÆ
+        glBindVertexArray(lightCubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         //----------
 
-        //-----æ‹¾å–ç‚¹-----
+        //-----Ê°È¡µã-----
         pickShader.use();
         pickShader.setMat4("projection", projection);
         pickShader.setMat4("view", view);
-        // ç»˜åˆ¶
-        glBindVertexArray(pickPointVAO);
         model = glm::mat4(1.0f);
         model = glm::translate(model, pickPos);
-        model = glm::scale(model, glm::vec3(0.05f)); // Make it a smaller cube
+        model = glm::scale(model, glm::vec3(0.03f)); // Make it a smaller cube
         lightCubeShader.setMat4("model", model);
+        // »æÖÆ
+        glBindVertexArray(pickPointVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         //----------
 
-        // æ£€æŸ¥äº‹ä»¶ï¼Œäº¤æ¢ç¼“å†²
+        // ¼ì²éÊÂ¼ş£¬½»»»»º³å
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -256,9 +265,12 @@ int main()
 
 void processInput(GLFWwindow *window)
 {
+    // °´ESCÍË³ö
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
+    // WSAD¿ØÖÆÉÏÏÂ×óÓÒ
+    // ¿Õ¸ñ¼üÉÏÉı£¬×óshiftÏÂ½µ
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera.ProcessKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -273,6 +285,13 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(DOWN, deltaTime);
 }
 
+void callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+    // tabÇĞ»»ÊÇ·ñÎªÏß¿òÄ£Ê½»æÖÆ
+    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
+        line_mode = !line_mode;
+}
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -280,6 +299,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
 {
+    // ÓÒ¼üµã»÷Ê±ÒÆ¶¯Êó±ê¿ØÖÆÊÓ½Ç
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
     {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -314,12 +334,15 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
+// ÊµÏÖÊ°È¡²Ù×÷µÄº¯Êı
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 {
+    // Êó±êµÄÆÁÄ»¿Õ¼ä×ø±ê
     double MouseX, MouseY;
     glfwGetCursorPos(window, &MouseX, &MouseY);
     switch (button)
     {
+        // ×ó¼üµ¥»÷Ê±
     case GLFW_MOUSE_BUTTON_LEFT:
         if (action == GLFW_PRESS)
         {
@@ -327,36 +350,35 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
             glm::mat4 view = camera.GetViewMatrix();
             glm::mat4 model = glm::mat4(1.0f);
 
+            // Ê°È¡²ÎÊı
             double mindis = 50.0;
             double maxZ = 10.0;
             bool flag = 0;
             int idx = -1;
 
-            glm::vec4 pointPosition = projection * view * model * glm::vec4(m_Model->meshes[0].vertices[0].Position, 1.0);
-
-            double screenX = (pointPosition.x + pointPosition.w) / (2 * pointPosition.w) * SCR_WIDTH;
-            double screenY = (pointPosition.w - pointPosition.y) / (2 * pointPosition.w) * SCR_HEIGHT;
-            double dis = glm::distance(glm::vec2(MouseX, MouseY), glm::vec2(screenX, screenY));
-
-            cout << screenX << " " << screenY << " " << pointPosition.z << endl;
+            // ¼ÆËãÄ£ĞÍËùÓĞµãµÄÆÁÄ»¿Õ¼ä×ø±ê
             for (int i = 0; i < m_Model->meshes[0].vertices.size(); i++)
             {
                 glm::vec4 pointPosition = projection * view * model * glm::vec4(m_Model->meshes[0].vertices[i].Position, 1.0);
 
                 double screenX = (pointPosition.x + pointPosition.w) / (2 * pointPosition.w) * SCR_WIDTH;
                 double screenY = (pointPosition.w - pointPosition.y) / (2 * pointPosition.w) * SCR_HEIGHT;
+                // ¼ÆËãÓëÊó±êµÄ¾àÀë
                 double dis = glm::distance(glm::vec2(MouseX, MouseY), glm::vec2(screenX, screenY));
-
+                // Ñ¡ÔñÓëÊó±ê¾àÀëÔÚ·¶Î§ÄÚµÄËùÓĞµãÀï×î½Ó½üÉãÏñ»úµÄµã
                 if (dis < mindis && pointPosition.z < maxZ)
                 {
-                    // mindis = dis;
                     maxZ = pointPosition.z;
                     flag = 1;
                     idx = i;
                 }
             }
             if (flag)
+            {
+                // Êä³öÊ°È¡µÄµãµÄ×ø±ê
                 pickPos = m_Model->meshes[0].vertices[idx].Position;
+                cout << "×ø±ê:( " << pickPos.x << " , " << pickPos.y << " , " << pickPos.z << " )" << endl;
+            }
         }
         break;
     }

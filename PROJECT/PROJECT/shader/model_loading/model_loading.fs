@@ -17,7 +17,7 @@ struct DirLight {
 //点光源
 struct PointLight {
     vec3 position;
-    //衰减
+    //衰减参数
     float constant;
     float linear;
     float quadratic;
@@ -26,13 +26,14 @@ struct PointLight {
     vec3 diffuse;
     vec3 specular;
 };  
-#define NR_POINT_LIGHTS 1//点光源数量
 //聚光
 struct SpotLight {
     vec3 position;
     vec3 direction;
-    float cutOff;//内圆锥
-    float outerCutOff;//外圆锥
+    //内圆锥
+    float cutOff;
+    //外圆锥
+    float outerCutOff;
 
     float constant;
     float linear;
@@ -45,12 +46,11 @@ struct SpotLight {
 
 in vec3 FragPos;
 in vec3 Normal;
-in vec2 TexCoords;
 
 uniform vec3 viewPos;
 uniform Material material;
 uniform DirLight dirLight;
-uniform PointLight pointLights[NR_POINT_LIGHTS];
+uniform PointLight pointLights;
 uniform SpotLight spotLight;
 
 out vec4 FragColor;
@@ -67,9 +67,7 @@ void main() {
     //定向光
     vec3 result = CalcDirLight(dirLight, norm, viewDir);
     //点光源
-    for (int i = 0; i < NR_POINT_LIGHTS; i++) {
-        result += CalcPointLight(pointLights[0], norm, FragPos, viewDir);
-    }
+    result += CalcPointLight(pointLights, norm, FragPos, viewDir);
     //聚光
     result += CalcSpotLight(spotLight, norm, FragPos, viewDir);
 
