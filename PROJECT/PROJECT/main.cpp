@@ -337,42 +337,55 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 // 实现拾取操作的函数
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 {
-    // 鼠标的屏幕空间坐标
-    double MouseX, MouseY;
-    glfwGetCursorPos(window, &MouseX, &MouseY);
+    // 得到鼠标点击屏幕的坐标
+    // mouse_x值为0到SCR_WIDTH的一个数
+    double mouse_x, mouse_y;
+    float mouse_z;
+    glfwGetCursorPos(window, &mouse_x, &mouse_y);
+    // 转换为鼠标的屏幕空间坐标
+    // mouse_xx值为-1到1的一个浮点数
+    float mouse_xx = (mouse_x * 2) / SCR_WIDTH - 1;
+    float mouse_yy = 1 - (mouse_y * 2) / SCR_HEIGHT;
+
     switch (button)
     {
         // 左键单击时
     case GLFW_MOUSE_BUTTON_LEFT:
         if (action == GLFW_PRESS)
         {
+            // 得到点击点的深度值
+            // 深度值mouse_z为0到1的一个浮点数
+            glReadBuffer(GL_BACK);
+            glReadPixels(int(mouse_x), SCR_HEIGHT - int(mouse_y) - 1, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &mouse_z);
+            // 求逆矩阵
             glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
             glm::mat4 view = camera.GetViewMatrix();
-            glm::mat4 model = glm::mat4(1.0f);
+            glm::mat4 _projection = glm::inverse(projection);
+            glm::mat4 _view = glm::inverse(view);
+            // 求点击处的世界空间坐标
+            // 将mouse_z的值映射到-1到1的范围
+            glm::vec4 pointPosition = _view * _projection * glm::vec4(mouse_xx, mouse_yy, 2 * mouse_z - 1.0, 1.0);
+            glm::vec3 clickPoint(pointPosition.x / pointPosition.w, pointPosition.y / pointPosition.w, pointPosition.z / pointPosition.w);
 
             // 拾取参数
-            double mindis = 50.0;
-            double maxZ = 10.0;
+            float mindis = 50.0;
             bool flag = 0;
             int idx = -1;
 
-            // 计算模型所有点的屏幕空间坐标
+            // 计算模型所有点到点击处的距离
+            // 选出最近的点
             for (int i = 0; i < m_Model->meshes[0].vertices.size(); i++)
             {
-                glm::vec4 pointPosition = projection * view * model * glm::vec4(m_Model->meshes[0].vertices[i].Position, 1.0);
-
-                double screenX = (pointPosition.x + pointPosition.w) / (2 * pointPosition.w) * SCR_WIDTH;
-                double screenY = (pointPosition.w - pointPosition.y) / (2 * pointPosition.w) * SCR_HEIGHT;
-                // 计算与鼠标的距离
-                double dis = glm::distance(glm::vec2(MouseX, MouseY), glm::vec2(screenX, screenY));
-                // 选择与鼠标距离在范围内的所有点里最接近摄像机的点
-                if (dis < mindis && pointPosition.z < maxZ)
+                float dis = glm::distance(clickPoint, m_Model->meshes[0].vertices[i].Position);
+                // 选择与鼠标距离在范围内的所有点里最接近点击处的点
+                if (dis < mindis)
                 {
-                    maxZ = pointPosition.z;
+                    mindis = dis;
                     flag = 1;
                     idx = i;
                 }
             }
+            // 如果拾取到了
             if (flag)
             {
                 // 输出拾取的点的坐标
