@@ -5,14 +5,16 @@
 
 ---
 
+### 编译方式
+使用XMake编译即可
+
 ### 文件结构
 
 |——include 包含目录  
-|——lib 库目录  
-|——PROJECT 项目文件  
+|——resources 模型数据    
+|——src 源代码  
 &emsp;&emsp;|——main.cpp  模型文件  
-&emsp;&emsp;|——head  自定义的类  
-&emsp;&emsp;|——model  模型数据  
+&emsp;&emsp;|——learnopengl   自定义的类    
 &emsp;&emsp;|——shader  着色器
 
 ---
