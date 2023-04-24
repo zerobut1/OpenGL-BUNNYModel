@@ -12,48 +12,23 @@
 #include <iostream>
 
 // 方块顶点数据
-float cube_vertices[] = {
-    -0.5f, -0.5f, -0.5f,
-    0.5f, -0.5f, -0.5f,
-    0.5f, 0.5f, -0.5f,
-    0.5f, 0.5f, -0.5f,
-    -0.5f, 0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
+float cube_vertices[] = {-0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, 0.5f,  0.5f,  -0.5f,
+                         0.5f,  0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, -0.5f, -0.5f,
 
-    -0.5f, -0.5f, 0.5f,
-    0.5f, -0.5f, 0.5f,
-    0.5f, 0.5f, 0.5f,
-    0.5f, 0.5f, 0.5f,
-    -0.5f, 0.5f, 0.5f,
-    -0.5f, -0.5f, 0.5f,
+                         -0.5f, -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  0.5f,  0.5f,
+                         0.5f,  0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f, -0.5f, 0.5f,
 
-    -0.5f, 0.5f, 0.5f,
-    -0.5f, 0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f, 0.5f,
-    -0.5f, 0.5f, 0.5f,
+                         -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f, -0.5f, -0.5f,
+                         -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,  0.5f,
 
-    0.5f, 0.5f, 0.5f,
-    0.5f, 0.5f, -0.5f,
-    0.5f, -0.5f, -0.5f,
-    0.5f, -0.5f, -0.5f,
-    0.5f, -0.5f, 0.5f,
-    0.5f, 0.5f, 0.5f,
+                         0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f,
+                         0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,  0.5f,  0.5f,  0.5f,
 
-    -0.5f, -0.5f, -0.5f,
-    0.5f, -0.5f, -0.5f,
-    0.5f, -0.5f, 0.5f,
-    0.5f, -0.5f, 0.5f,
-    -0.5f, -0.5f, 0.5f,
-    -0.5f, -0.5f, -0.5f,
+                         -0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,
+                         0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, -0.5f,
 
-    -0.5f, 0.5f, -0.5f,
-    0.5f, 0.5f, -0.5f,
-    0.5f, 0.5f, 0.5f,
-    0.5f, 0.5f, 0.5f,
-    -0.5f, 0.5f, 0.5f,
-    -0.5f, 0.5f, -0.5f};
+                         -0.5f, 0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  0.5f,
+                         0.5f,  0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f};
 
 void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -67,7 +42,7 @@ const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 
 // 摄像机对象
-Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -77,10 +52,10 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // 光源位置
-glm::vec3 lightPos(-10.0f, 3.0f, 10.0f);
+glm::vec3 lightPos(5.0f, 5.0f, -5.0f);
 
 // 拾取的点的位置
-glm::vec3 pickPos(2.696138f, 2.284638f, 9.227790f);
+glm::vec3 pickPos(0.0f, 0.0f, -4.0f);
 
 // 模型指针
 Model *m_Model = NULL;
@@ -92,8 +67,8 @@ int main()
 {
     // 初始化
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // 创建窗口
@@ -134,15 +109,19 @@ int main()
     Model ourModel("../resources/objects/bunny/bunny_iH.ply");
     m_Model = &ourModel;
 
+    //-----立方体的VBO-----
+    unsigned int CubeVBO;
+    glGenBuffers(1, &CubeVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, CubeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
+    //----------
+
     //-----点光源的VAO-----
     unsigned int lightCubeVAO;
     glGenVertexArrays(1, &lightCubeVAO);
     glBindVertexArray(lightCubeVAO);
-    unsigned int lightCubeVBO;
-    glGenBuffers(1, &lightCubeVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, lightCubeVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, lightCubeVBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, CubeVBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
     //----------
@@ -151,11 +130,8 @@ int main()
     unsigned int pickPointVAO;
     glGenVertexArrays(1, &pickPointVAO);
     glBindVertexArray(pickPointVAO);
-    unsigned int pickPointVBO;
-    glGenBuffers(1, &pickPointVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, pickPointVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, pickPointVBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, CubeVBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
     //----------
@@ -176,7 +152,8 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // 投影矩阵与观察矩阵
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection =
+            glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
 
         //-----渲染模型-----
@@ -184,6 +161,7 @@ int main()
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
         glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         ourShader.setMat4("model", model);
         // 采用亮铜的材质
         ourShader.setVec3("material.ambient", 0.229500f, 0.088250f, 0.027500f);
@@ -246,8 +224,10 @@ int main()
         pickShader.setMat4("projection", projection);
         pickShader.setMat4("view", view);
         model = glm::mat4(1.0f);
+        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::translate(model, pickPos);
         model = glm::scale(model, glm::vec3(0.03f)); // Make it a smaller cube
+
         lightCubeShader.setMat4("model", model);
         // 绘制
         glBindVertexArray(pickPointVAO);
@@ -255,8 +235,8 @@ int main()
         //----------
 
         // 检查事件，交换缓冲
-        glfwSwapBuffers(window);
         glfwPollEvents();
+        glfwSwapBuffers(window);
     }
 
     glfwTerminate();
@@ -355,17 +335,25 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
         {
             // 得到点击点的深度值
             // 深度值mouse_z为0到1的一个浮点数
-            glReadBuffer(GL_BACK);
+            glReadBuffer(GL_FRONT);
             glReadPixels(int(mouse_x), SCR_HEIGHT - int(mouse_y) - 1, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &mouse_z);
+
             // 求逆矩阵
-            glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+            glm::mat4 projection =
+                glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
             glm::mat4 view = camera.GetViewMatrix();
+            glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
             glm::mat4 _projection = glm::inverse(projection);
             glm::mat4 _view = glm::inverse(view);
-            // 求点击处的世界空间坐标
+            glm::mat4 _model = glm::inverse(model);
+
+            // 求点击处的局部空间坐标
             // 将mouse_z的值映射到-1到1的范围
-            glm::vec4 pointPosition = _view * _projection * glm::vec4(mouse_xx, mouse_yy, 2 * mouse_z - 1.0, 1.0);
-            glm::vec3 clickPoint(pointPosition.x / pointPosition.w, pointPosition.y / pointPosition.w, pointPosition.z / pointPosition.w);
+            glm::vec4 pointPosition =
+                _model * _view * _projection * glm::vec4(mouse_xx, mouse_yy, 2 * mouse_z - 1.0f, 1.0f);
+            glm::vec3 clickPoint(pointPosition.x / pointPosition.w,
+                                 pointPosition.y / pointPosition.w,
+                                 pointPosition.z / pointPosition.w);
 
             // 拾取参数
             float mindis = 50.0;
