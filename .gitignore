@@ -1,3 +1,4 @@
-.clangd
-.xmake
+.clang-format
+.xmake/
+.vscode/
 /build

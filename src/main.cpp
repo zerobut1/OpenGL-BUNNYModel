@@ -1,34 +1,61 @@
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <stb_image.h>
 
-#include "learnopengl/shader.h"
 #include "learnopengl/camera.h"
 #include "learnopengl/model.h"
+#include "learnopengl/shader.h"
 
 #include <iostream>
 
 // 方块顶点数据
-float cube_vertices[] = {-0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, 0.5f,  0.5f,  -0.5f,
-                         0.5f,  0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, -0.5f, -0.5f,
+// clang-format off
+float cube_vertices[] = {
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
 
-                         -0.5f, -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  0.5f,  0.5f,
-                         0.5f,  0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f, -0.5f, 0.5f,
+    -0.5f, -0.5f,  0.5f, 
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f, 
+    -0.5f,  0.5f,  0.5f, 
+    -0.5f, -0.5f,  0.5f,
 
-                         -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f, -0.5f, -0.5f,
-                         -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f, 
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f, 
+    -0.5f, -0.5f,  0.5f, 
+    -0.5f,  0.5f,  0.5f,
 
-                         0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f,
-                         0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,  0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f, 
+     0.5f,  0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
 
-                         -0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,
-                         0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,  
+    -0.5f, -0.5f,  0.5f, 
+    -0.5f, -0.5f, -0.5f,
 
-                         -0.5f, 0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  0.5f,
-                         0.5f,  0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f};
+    -0.5f,  0.5f, -0.5f, 
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f, 
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f};
+// clang-format on
 
 void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -38,13 +65,13 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 void callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
 // 窗口大小设置
-const unsigned int SCR_WIDTH = 1920;
+const unsigned int SCR_WIDTH  = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 
 // 摄像机对象
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
+float lastX     = SCR_WIDTH / 2.0f;
+float lastY     = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
 // 时间差
@@ -130,10 +157,6 @@ int main()
     unsigned int pickPointVAO;
     glGenVertexArrays(1, &pickPointVAO);
     glBindVertexArray(pickPointVAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, CubeVBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(0);
     //----------
 
     // 渲染循环
@@ -141,8 +164,8 @@ int main()
     {
         // 时间差
         float currentFrame = static_cast<float>(glfwGetTime());
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        deltaTime          = currentFrame - lastFrame;
+        lastFrame          = currentFrame;
 
         // 检测输入
         processInput(window);
@@ -152,16 +175,15 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // 投影矩阵与观察矩阵
-        glm::mat4 projection =
-            glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 view       = camera.GetViewMatrix();
 
         //-----渲染模型-----
         ourShader.use();
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model           = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         ourShader.setMat4("model", model);
         // 采用亮铜的材质
         ourShader.setVec3("material.ambient", 0.229500f, 0.088250f, 0.027500f);
@@ -227,11 +249,12 @@ int main()
         model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::translate(model, pickPos);
         model = glm::scale(model, glm::vec3(0.03f)); // Make it a smaller cube
-
-        lightCubeShader.setMat4("model", model);
+        pickShader.setMat4("model", model);
         // 绘制
         glBindVertexArray(pickPointVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        glEnable(GL_PROGRAM_POINT_SIZE);
+        glDrawArrays(GL_POINTS, 0, 1);
         //----------
 
         // 检查事件，交换缓冲
@@ -289,8 +312,8 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
 
         if (firstMouse)
         {
-            lastX = xpos;
-            lastY = ypos;
+            lastX      = xpos;
+            lastY      = ypos;
             firstMouse = false;
         }
 
@@ -317,15 +340,19 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 // 实现拾取操作的函数
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 {
+    int scr_width, scr_height;
+    glfwGetWindowSize(window, &scr_width, &scr_height);
+
     // 得到鼠标点击屏幕的坐标
     // mouse_x值为0到SCR_WIDTH的一个数
-    double mouse_x, mouse_y;
+    double mouse_x,
+        mouse_y;
     float mouse_z;
     glfwGetCursorPos(window, &mouse_x, &mouse_y);
     // 转换为鼠标的屏幕空间坐标
     // mouse_xx值为-1到1的一个浮点数
-    float mouse_xx = (mouse_x * 2) / SCR_WIDTH - 1;
-    float mouse_yy = 1 - (mouse_y * 2) / SCR_HEIGHT;
+    float mouse_xx = (mouse_x * 2) / scr_width - 1;
+    float mouse_yy = 1 - (mouse_y * 2) / scr_height;
 
     switch (button)
     {
@@ -336,16 +363,16 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
             // 得到点击点的深度值
             // 深度值mouse_z为0到1的一个浮点数
             glReadBuffer(GL_FRONT);
-            glReadPixels(int(mouse_x), SCR_HEIGHT - int(mouse_y) - 1, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &mouse_z);
+            glReadPixels(int(mouse_x), scr_height - int(mouse_y) - 1, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &mouse_z);
 
             // 求逆矩阵
             glm::mat4 projection =
-                glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-            glm::mat4 view = camera.GetViewMatrix();
-            glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                glm::perspective(glm::radians(camera.Zoom), (float)scr_width / (float)scr_height, 0.1f, 100.0f);
+            glm::mat4 view        = camera.GetViewMatrix();
+            glm::mat4 model       = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
             glm::mat4 _projection = glm::inverse(projection);
-            glm::mat4 _view = glm::inverse(view);
-            glm::mat4 _model = glm::inverse(model);
+            glm::mat4 _view       = glm::inverse(view);
+            glm::mat4 _model      = glm::inverse(model);
 
             // 求点击处的局部空间坐标
             // 将mouse_z的值映射到-1到1的范围
@@ -357,8 +384,8 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 
             // 拾取参数
             float mindis = 50.0;
-            bool flag = 0;
-            int idx = -1;
+            bool flag    = 0;
+            int idx      = -1;
 
             // 计算模型所有点到点击处的距离
             // 选出最近的点
@@ -369,8 +396,8 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
                 if (dis < mindis)
                 {
                     mindis = dis;
-                    flag = 1;
-                    idx = i;
+                    flag   = 1;
+                    idx    = i;
                 }
             }
             // 如果拾取到了
